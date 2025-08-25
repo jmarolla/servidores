@@ -1,5 +1,7 @@
 "use client"
 
+import type React from "react"
+
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -16,7 +18,7 @@ import {
 } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Shield, Plus, Save, Monitor, Activity, Edit, Users, Trash2 } from "lucide-react"
+import { Server, Plus, Save, Monitor, Activity, Edit, Users, Trash2 } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 
 interface ServerInterface {
@@ -42,20 +44,20 @@ interface User {
 }
 
 export default function ServerManager() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [currentUser, setCurrentUser] = useState<User | null>(null)
-  const [loginForm, setLoginForm] = useState({ username: "", password: "" })
-  const [isRegisterMode, setIsRegisterMode] = useState(false)
-  const [registerForm, setRegisterForm] = useState({ username: "", email: "", password: "", confirmPassword: "" })
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [currentUser, setCurrentUser] = useState<any | null>(null)
+  const [username, setUsername] = useState("")
+  const [password, setPassword] = useState("")
+  const [loginError, setLoginError] = useState("")
 
-  const [users, setUsers] = useState<User[]>([])
+  const [users, setUsers] = useState<any[]>([])
   const [isAddUserDialogOpen, setIsAddUserDialogOpen] = useState(false)
-  const [newUser, setNewUser] = useState<Partial<User>>({})
+  const [newUser, setNewUser] = useState<any>({})
 
   const [servers, setServers] = useState<ServerInterface[]>([])
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
-  const [newServer, setNewServer] = useState<Partial<ServerInterface>>({})
+  const [newServer, setNewServer] = useState<any>({})
   const [editingServer, setEditingServer] = useState<ServerInterface | null>(null)
   const { toast } = useToast()
 
@@ -65,7 +67,7 @@ export default function ServerManager() {
       setUsers(JSON.parse(savedUsers))
     } else {
       // Create default admin user
-      const defaultAdmin: User = {
+      const defaultAdmin = {
         id: 1,
         username: "admin",
         email: "admin@gs1.com",
@@ -85,7 +87,7 @@ export default function ServerManager() {
   }, [users])
 
   useEffect(() => {
-    if (isAuthenticated) {
+    if (isLoggedIn) {
       setServers([
         {
           id: 1,
@@ -135,7 +137,7 @@ export default function ServerManager() {
           dns: "ec2-34-193-208-63.compute-1.amazonaws.com",
           usuario: "administrador",
           contrasena: "t$C?dBVlX3epybGpTF)rGlH?gThTa",
-          status: "maintenance",
+          status: "online",
         },
         {
           id: 6,
@@ -165,7 +167,7 @@ export default function ServerManager() {
           dns: "https://ec2-54-91-241-121.compute-1.amazonaws.com",
           usuario: "usuario dominio",
           contrasena: "pass dominio",
-          status: "offline",
+          status: "online",
         },
         {
           id: 9,
@@ -175,7 +177,7 @@ export default function ServerManager() {
           dns: "ec2-34-193-208-63.compute-1.amazonaws.com",
           usuario: "administrador",
           contrasena: "g2*St&amxihQ@*Kalm78ip*Ed9zl4KzJ",
-          status: "maintenance",
+          status: "online",
         },
         {
           id: 10,
@@ -185,7 +187,7 @@ export default function ServerManager() {
           dns: "ec2-44-223-11-252.compute-1.amazonaws.com",
           usuario: "administrador",
           contrasena: "g2*St&amxihQ@*Kalm78ip*Ed9zl4KzJ",
-          status: "offline",
+          status: "online",
         },
         {
           id: 11,
@@ -195,7 +197,7 @@ export default function ServerManager() {
           dns: "ec2-54-90-50-97.compute-1.amazonaws.com",
           usuario: "administrador",
           contrasena: "123r#zq%$!@$o&4p&7n&72&4hn19*pq",
-          status: "maintenance",
+          status: "online",
         },
         {
           id: 12,
@@ -215,7 +217,7 @@ export default function ServerManager() {
           dns: "ec2-52-54-155-1.compute-1.amazonaws.com",
           usuario: "administrador...",
           contrasena: "fC=ZM%ujrOEjZNMRhF5XPq359l$7d*=M",
-          status: "offline",
+          status: "online",
         },
         {
           id: 14,
@@ -245,7 +247,7 @@ export default function ServerManager() {
           dns: "",
           usuario: "user",
           contrasena: "",
-          status: "offline",
+          status: "online",
         },
         {
           id: 17,
@@ -259,64 +261,30 @@ export default function ServerManager() {
         },
       ])
     }
-  }, [isAuthenticated])
+  }, [isLoggedIn])
 
-  const handleLogin = () => {
-    const user = users.find((u) => u.username === loginForm.username && u.password === loginForm.password)
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault()
+
+    const users = JSON.parse(localStorage.getItem("gs1-users") || "[]")
+    const user = users.find((u: any) => u.username === username && u.password === password)
+
     if (user) {
-      setIsAuthenticated(true)
       setCurrentUser(user)
-      // Update last login
-      const updatedUsers = users.map((u) => (u.id === user.id ? { ...u, lastLogin: new Date().toISOString() } : u))
-      setUsers(updatedUsers)
+      setIsLoggedIn(true)
+      setLoginError("")
       toast({
         title: "Acceso concedido",
         description: `Bienvenido ${user.username}`,
       })
     } else {
+      setLoginError("Usuario o contraseña incorrectos")
       toast({
         title: "Error de autenticación",
         description: "Usuario o contraseña incorrectos",
         variant: "destructive",
       })
     }
-  }
-
-  const handleRegister = () => {
-    if (registerForm.password !== registerForm.confirmPassword) {
-      toast({
-        title: "Error",
-        description: "Las contraseñas no coinciden",
-        variant: "destructive",
-      })
-      return
-    }
-
-    if (users.find((u) => u.username === registerForm.username)) {
-      toast({
-        title: "Error",
-        description: "El usuario ya existe",
-        variant: "destructive",
-      })
-      return
-    }
-
-    const newUser: User = {
-      id: users.length + 1,
-      username: registerForm.username,
-      email: registerForm.email,
-      password: registerForm.password,
-      role: "user",
-      createdAt: new Date().toISOString(),
-    }
-
-    setUsers([...users, newUser])
-    setRegisterForm({ username: "", email: "", password: "", confirmPassword: "" })
-    setIsRegisterMode(false)
-    toast({
-      title: "Usuario creado",
-      description: "Ahora puedes iniciar sesión",
-    })
   }
 
   const handleAddUser = () => {
@@ -330,7 +298,7 @@ export default function ServerManager() {
         return
       }
 
-      const user: User = {
+      const user = {
         id: users.length + 1,
         username: newUser.username || "",
         email: newUser.email || "",
@@ -505,102 +473,54 @@ domain:s:`
     }
   }
 
-  if (!isAuthenticated) {
+  if (!isLoggedIn) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100 flex items-center justify-center p-4">
-        <Card className="w-full max-w-md shadow-xl">
-          <CardHeader className="text-center space-y-4">
-            <div className="mx-auto w-16 h-16 bg-primary rounded-full flex items-center justify-center">
-              <Shield className="w-8 h-8 text-primary-foreground" />
+      <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-teal-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md">
+          <div className="text-center mb-8">
+            <div className="w-16 h-16 bg-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Server className="w-8 h-8 text-white" />
             </div>
+            <div className="flex items-center justify-center space-x-3 mb-2">
+              <img src="/gs1_icon.ico" alt="GS1 Logo" className="w-8 h-8" />
+              <h1 className="text-2xl font-bold text-gray-900">Gestor de Servidores GS1</h1>
+            </div>
+            <p className="text-gray-600">Accede a tu panel de control</p>
+          </div>
+
+          <form onSubmit={handleLogin} className="space-y-6">
             <div>
-              <CardTitle className="text-2xl font-playfair">Gestor de Servidores GS1</CardTitle>
-              <CardDescription>
-                {isRegisterMode ? "Crear nueva cuenta" : "Ingrese sus credenciales para acceder al sistema"}
-              </CardDescription>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Usuario</label>
+              <input
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                required
+              />
             </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {!isRegisterMode ? (
-              <>
-                <div className="space-y-2">
-                  <Label htmlFor="username">Usuario</Label>
-                  <Input
-                    id="username"
-                    value={loginForm.username}
-                    onChange={(e) => setLoginForm({ ...loginForm, username: e.target.value })}
-                    placeholder="Ingrese su usuario"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="password">Contraseña</Label>
-                  <Input
-                    id="password"
-                    type="password"
-                    value={loginForm.password}
-                    onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })}
-                    onKeyPress={(e) => e.key === "Enter" && handleLogin()}
-                    placeholder="Ingrese su contraseña"
-                  />
-                </div>
-                <Button onClick={handleLogin} className="w-full">
-                  Ingresar al Sistema
-                </Button>
-                <Button variant="outline" onClick={() => setIsRegisterMode(true)} className="w-full">
-                  Crear nueva cuenta
-                </Button>
-              </>
-            ) : (
-              <>
-                <div className="space-y-2">
-                  <Label htmlFor="reg-username">Usuario</Label>
-                  <Input
-                    id="reg-username"
-                    value={registerForm.username}
-                    onChange={(e) => setRegisterForm({ ...registerForm, username: e.target.value })}
-                    placeholder="Nombre de usuario"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="reg-email">Email</Label>
-                  <Input
-                    id="reg-email"
-                    type="email"
-                    value={registerForm.email}
-                    onChange={(e) => setRegisterForm({ ...registerForm, email: e.target.value })}
-                    placeholder="correo@ejemplo.com"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="reg-password">Contraseña</Label>
-                  <Input
-                    id="reg-password"
-                    type="password"
-                    value={registerForm.password}
-                    onChange={(e) => setRegisterForm({ ...registerForm, password: e.target.value })}
-                    placeholder="Contraseña"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="reg-confirm">Confirmar Contraseña</Label>
-                  <Input
-                    id="reg-confirm"
-                    type="password"
-                    value={registerForm.confirmPassword}
-                    onChange={(e) => setRegisterForm({ ...registerForm, confirmPassword: e.target.value })}
-                    placeholder="Confirmar contraseña"
-                  />
-                </div>
-                <Button onClick={handleRegister} className="w-full">
-                  Crear Cuenta
-                </Button>
-                <Button variant="outline" onClick={() => setIsRegisterMode(false)} className="w-full">
-                  Volver al login
-                </Button>
-              </>
-            )}
-          </CardContent>
-        </Card>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Contraseña</label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                required
+              />
+            </div>
+
+            {loginError && <div className="text-red-600 text-sm text-center">{loginError}</div>}
+
+            <button
+              type="submit"
+              className="w-full bg-emerald-600 text-white py-3 px-4 rounded-lg hover:bg-emerald-700 transition-colors font-medium"
+            >
+              Iniciar Sesión
+            </button>
+          </form>
+        </div>
       </div>
     )
   }
@@ -612,8 +532,8 @@ domain:s:`
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-                <Plus className="w-6 h-6 text-primary-foreground" />
+              <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center border">
+                <img src="/gs1_icon.ico" alt="GS1 Logo" className="w-6 h-6" />
               </div>
               <div>
                 <h1 className="text-2xl font-playfair font-bold">Gestor de Servidores GS1</h1>
@@ -625,9 +545,10 @@ domain:s:`
             <Button
               variant="outline"
               onClick={() => {
-                setIsAuthenticated(false)
+                setIsLoggedIn(false)
                 setCurrentUser(null)
-                setLoginForm({ username: "", password: "" })
+                setUsername("")
+                setPassword("")
               }}
             >
               Cerrar Sesión
