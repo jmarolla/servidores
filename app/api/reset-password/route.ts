@@ -2,12 +2,12 @@ import { type NextRequest, NextResponse } from "next/server"
 
 export async function POST(request: NextRequest) {
   try {
-    const { token, email, newPassword } = await request.json()
+    const { token, newPassword } = await request.json()
 
-    if (!token || !email || !newPassword) {
+    if (!token || !newPassword) {
       return NextResponse.json(
         {
-          error: "Token, email y nueva contraseña son requeridos",
+          error: "Token y nueva contraseña son requeridos",
         },
         { status: 400 },
       )
@@ -15,9 +15,9 @@ export async function POST(request: NextRequest) {
 
     // Validate token (in production, check against database)
     const resetTokens = JSON.parse(process.env.RESET_TOKENS || "{}")
-    const tokenData = resetTokens[email]
+    const tokenData = resetTokens[token]
 
-    if (!tokenData || tokenData.token !== token || Date.now() > tokenData.expiry) {
+    if (!tokenData || Date.now() > tokenData.expiry) {
       return NextResponse.json(
         {
           error: "Token inválido o expirado",
@@ -31,10 +31,12 @@ export async function POST(request: NextRequest) {
     // The frontend will handle updating localStorage
 
     // Clear the used token
-    delete resetTokens[email]
+    delete resetTokens[token]
+    process.env.RESET_TOKENS = JSON.stringify(resetTokens)
 
     return NextResponse.json({
       message: "Contraseña actualizada exitosamente",
+      email: tokenData.email,
     })
   } catch (error) {
     console.error("Error resetting password:", error)

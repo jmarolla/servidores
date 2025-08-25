@@ -25,9 +25,8 @@ export default function ResetPassword() {
 
   useEffect(() => {
     const tokenParam = searchParams.get("token")
-    const emailParam = searchParams.get("email")
 
-    if (!tokenParam || !emailParam) {
+    if (!tokenParam) {
       toast({
         title: "Enlace inválido",
         description: "El enlace de recuperación no es válido",
@@ -38,7 +37,6 @@ export default function ResetPassword() {
     }
 
     setToken(tokenParam)
-    setEmail(emailParam)
   }, [searchParams, router, toast])
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -72,7 +70,6 @@ export default function ResetPassword() {
         },
         body: JSON.stringify({
           token,
-          email,
           newPassword,
         }),
       })
@@ -80,10 +77,10 @@ export default function ResetPassword() {
       const data = await response.json()
 
       if (response.ok) {
-        // Update the user's password in localStorage
+        const userEmail = data.email
         const users = JSON.parse(localStorage.getItem("gs1-users") || "[]")
         const updatedUsers = users.map((user: any) =>
-          user.email === email ? { ...user, password: newPassword } : user,
+          user.email === userEmail ? { ...user, password: newPassword } : user,
         )
         localStorage.setItem("gs1-users", JSON.stringify(updatedUsers))
 
@@ -122,7 +119,7 @@ export default function ResetPassword() {
             <img src="/gs1_icon.ico" alt="GS1 Logo" className="w-8 h-8" />
             <CardTitle className="text-2xl font-bold">Restablecer Contraseña</CardTitle>
           </div>
-          <CardDescription>Ingresa tu nueva contraseña para {email}</CardDescription>
+          <CardDescription>Ingresa tu nueva contraseña</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
