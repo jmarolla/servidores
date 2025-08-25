@@ -59,6 +59,9 @@ export default function ServerManager() {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
   const [newServer, setNewServer] = useState<any>({})
   const [editingServer, setEditingServer] = useState<ServerInterface | null>(null)
+  const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false)
+  const [forgotEmail, setForgotEmail] = useState("")
+  const [isLoadingForgot, setIsLoadingForgot] = useState(false)
   const { toast } = useToast()
 
   useEffect(() => {
@@ -460,6 +463,69 @@ domain:s:`
     }
   }
 
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    if (!forgotEmail) {
+      toast({
+        title: "Error",
+        description: "Por favor ingresa tu email",
+        variant: "destructive",
+      })
+      return
+    }
+
+    // Check if email exists in users
+    const users = JSON.parse(localStorage.getItem("gs1-users") || "[]")
+    const userExists = users.find((u: any) => u.email === forgotEmail)
+
+    if (!userExists) {
+      toast({
+        title: "Error",
+        description: "No existe una cuenta con ese email",
+        variant: "destructive",
+      })
+      return
+    }
+
+    setIsLoadingForgot(true)
+
+    try {
+      const response = await fetch("/api/forgot-password", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email: forgotEmail }),
+      })
+
+      const data = await response.json()
+
+      if (response.ok) {
+        toast({
+          title: "Email enviado",
+          description: "Revisa tu email para las instrucciones de recuperación",
+        })
+        setIsForgotPasswordOpen(false)
+        setForgotEmail("")
+      } else {
+        toast({
+          title: "Error",
+          description: data.error || "Error al enviar el email",
+          variant: "destructive",
+        })
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Error de conexión. Intenta nuevamente.",
+        variant: "destructive",
+      })
+    } finally {
+      setIsLoadingForgot(false)
+    }
+  }
+
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "online":
@@ -519,8 +585,48 @@ domain:s:`
             >
               Iniciar Sesión
             </button>
+
+            <div className="text-center">
+              <button
+                type="button"
+                onClick={() => setIsForgotPasswordOpen(true)}
+                className="text-emerald-600 hover:text-emerald-700 text-sm font-medium"
+              >
+                ¿Olvidaste tu contraseña?
+              </button>
+            </div>
           </form>
         </div>
+
+        <Dialog open={isForgotPasswordOpen} onOpenChange={setIsForgotPasswordOpen}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle className="font-playfair">Recuperar Contraseña</DialogTitle>
+              <DialogDescription>Ingresa tu email para recibir las instrucciones de recuperación</DialogDescription>
+            </DialogHeader>
+            <form onSubmit={handleForgotPassword} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="forgot-email">Email</Label>
+                <Input
+                  id="forgot-email"
+                  type="email"
+                  value={forgotEmail}
+                  onChange={(e) => setForgotEmail(e.target.value)}
+                  placeholder="tu@email.com"
+                  required
+                />
+              </div>
+              <div className="flex justify-end space-x-2">
+                <Button type="button" variant="outline" onClick={() => setIsForgotPasswordOpen(false)}>
+                  Cancelar
+                </Button>
+                <Button type="submit" disabled={isLoadingForgot}>
+                  {isLoadingForgot ? "Enviando..." : "Enviar Email"}
+                </Button>
+              </div>
+            </form>
+          </DialogContent>
+        </Dialog>
       </div>
     )
   }
