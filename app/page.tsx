@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Server, Plus, Save, Monitor, Activity, Edit, Users, Trash2, Copy } from "lucide-react"
+import { Plus, Save, Monitor, Activity, Edit, Users, Trash2, Copy } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 
 interface ServerInterface {
@@ -560,11 +560,10 @@ domain:s:`
       <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-teal-50 flex items-center justify-center p-4">
         <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md">
           <div className="text-center mb-8">
-            <div className="w-16 h-16 bg-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Server className="w-8 h-8 text-white" />
+            <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-emerald-200">
+              <img src="/gs1_icon.ico" alt="GS1 Logo" className="w-10 h-10" />
             </div>
-            <div className="flex items-center justify-center space-x-3 mb-2">
-              <img src="/gs1_icon.ico" alt="GS1 Logo" className="w-8 h-8" />
+            <div className="mb-2">
               <h1 className="text-2xl font-bold text-gray-900">Gestor de Servidores GS1</h1>
             </div>
             <p className="text-gray-600">Accede a tu panel de control</p>
