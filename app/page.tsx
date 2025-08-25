@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Shield, Plus, Save, Monitor, Activity, Edit } from "lucide-react"
+import { Shield, Plus, Save, Monitor, Activity, Edit, Users, Trash2 } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 
 interface ServerInterface {
@@ -31,15 +31,58 @@ interface ServerInterface {
   status?: "online" | "offline" | "maintenance"
 }
 
+interface User {
+  id: number
+  username: string
+  email: string
+  password: string
+  role: "admin" | "user"
+  createdAt: string
+  lastLogin?: string
+}
+
 export default function ServerManager() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [password, setPassword] = useState("")
+  const [currentUser, setCurrentUser] = useState<User | null>(null)
+  const [loginForm, setLoginForm] = useState({ username: "", password: "" })
+  const [isRegisterMode, setIsRegisterMode] = useState(false)
+  const [registerForm, setRegisterForm] = useState({ username: "", email: "", password: "", confirmPassword: "" })
+
+  const [users, setUsers] = useState<User[]>([])
+  const [isAddUserDialogOpen, setIsAddUserDialogOpen] = useState(false)
+  const [newUser, setNewUser] = useState<Partial<User>>({})
+
   const [servers, setServers] = useState<ServerInterface[]>([])
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
   const [newServer, setNewServer] = useState<Partial<ServerInterface>>({})
   const [editingServer, setEditingServer] = useState<ServerInterface | null>(null)
   const { toast } = useToast()
+
+  useEffect(() => {
+    const savedUsers = localStorage.getItem("gs1-users")
+    if (savedUsers) {
+      setUsers(JSON.parse(savedUsers))
+    } else {
+      // Create default admin user
+      const defaultAdmin: User = {
+        id: 1,
+        username: "admin",
+        email: "admin@gs1.com",
+        password: "gs1admin2024", // In production, this should be hashed
+        role: "admin",
+        createdAt: new Date().toISOString(),
+      }
+      setUsers([defaultAdmin])
+      localStorage.setItem("gs1-users", JSON.stringify([defaultAdmin]))
+    }
+  }, [])
+
+  useEffect(() => {
+    if (users.length > 0) {
+      localStorage.setItem("gs1-users", JSON.stringify(users))
+    }
+  }, [users])
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -219,19 +262,107 @@ export default function ServerManager() {
   }, [isAuthenticated])
 
   const handleLogin = () => {
-    if (password === "gs1admin2024") {
+    const user = users.find((u) => u.username === loginForm.username && u.password === loginForm.password)
+    if (user) {
       setIsAuthenticated(true)
+      setCurrentUser(user)
+      // Update last login
+      const updatedUsers = users.map((u) => (u.id === user.id ? { ...u, lastLogin: new Date().toISOString() } : u))
+      setUsers(updatedUsers)
       toast({
         title: "Acceso concedido",
-        description: "Bienvenido al sistema de gestión de servidores",
+        description: `Bienvenido ${user.username}`,
       })
     } else {
       toast({
         title: "Error de autenticación",
-        description: "Contraseña incorrecta",
+        description: "Usuario o contraseña incorrectos",
         variant: "destructive",
       })
     }
+  }
+
+  const handleRegister = () => {
+    if (registerForm.password !== registerForm.confirmPassword) {
+      toast({
+        title: "Error",
+        description: "Las contraseñas no coinciden",
+        variant: "destructive",
+      })
+      return
+    }
+
+    if (users.find((u) => u.username === registerForm.username)) {
+      toast({
+        title: "Error",
+        description: "El usuario ya existe",
+        variant: "destructive",
+      })
+      return
+    }
+
+    const newUser: User = {
+      id: users.length + 1,
+      username: registerForm.username,
+      email: registerForm.email,
+      password: registerForm.password,
+      role: "user",
+      createdAt: new Date().toISOString(),
+    }
+
+    setUsers([...users, newUser])
+    setRegisterForm({ username: "", email: "", password: "", confirmPassword: "" })
+    setIsRegisterMode(false)
+    toast({
+      title: "Usuario creado",
+      description: "Ahora puedes iniciar sesión",
+    })
+  }
+
+  const handleAddUser = () => {
+    if (newUser.username && newUser.email && newUser.password) {
+      if (users.find((u) => u.username === newUser.username)) {
+        toast({
+          title: "Error",
+          description: "El usuario ya existe",
+          variant: "destructive",
+        })
+        return
+      }
+
+      const user: User = {
+        id: users.length + 1,
+        username: newUser.username || "",
+        email: newUser.email || "",
+        password: newUser.password || "",
+        role: newUser.role || "user",
+        createdAt: new Date().toISOString(),
+      }
+      setUsers([...users, user])
+      setNewUser({})
+      setIsAddUserDialogOpen(false)
+      toast({
+        title: "Usuario agregado",
+        description: `${user.username} ha sido agregado exitosamente`,
+      })
+    }
+  }
+
+  const handleDeleteUser = (userId: number) => {
+    if (userId === 1) {
+      // Protect default admin
+      toast({
+        title: "Error",
+        description: "No se puede eliminar el usuario administrador principal",
+        variant: "destructive",
+      })
+      return
+    }
+    setUsers(users.filter((u) => u.id !== userId))
+    toast({
+      title: "Usuario eliminado",
+      description: "El usuario ha sido eliminado exitosamente",
+    })
   }
 
   const handleAddServer = () => {
@@ -384,24 +515,90 @@ domain:s:`
             </div>
             <div>
               <CardTitle className="text-2xl font-playfair">Gestor de Servidores GS1</CardTitle>
-              <CardDescription>Ingrese sus credenciales para acceder al sistema</CardDescription>
+              <CardDescription>
+                {isRegisterMode ? "Crear nueva cuenta" : "Ingrese sus credenciales para acceder al sistema"}
+              </CardDescription>
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="password">Contraseña</Label>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                onKeyPress={(e) => e.key === "Enter" && handleLogin()}
-                placeholder="Ingrese su contraseña"
-              />
-            </div>
-            <Button onClick={handleLogin} className="w-full">
-              Ingresar al Sistema
-            </Button>
+            {!isRegisterMode ? (
+              <>
+                <div className="space-y-2">
+                  <Label htmlFor="username">Usuario</Label>
+                  <Input
+                    id="username"
+                    value={loginForm.username}
+                    onChange={(e) => setLoginForm({ ...loginForm, username: e.target.value })}
+                    placeholder="Ingrese su usuario"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="password">Contraseña</Label>
+                  <Input
+                    id="password"
+                    type="password"
+                    value={loginForm.password}
+                    onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })}
+                    onKeyPress={(e) => e.key === "Enter" && handleLogin()}
+                    placeholder="Ingrese su contraseña"
+                  />
+                </div>
+                <Button onClick={handleLogin} className="w-full">
+                  Ingresar al Sistema
+                </Button>
+                <Button variant="outline" onClick={() => setIsRegisterMode(true)} className="w-full">
+                  Crear nueva cuenta
+                </Button>
+              </>
+            ) : (
+              <>
+                <div className="space-y-2">
+                  <Label htmlFor="reg-username">Usuario</Label>
+                  <Input
+                    id="reg-username"
+                    value={registerForm.username}
+                    onChange={(e) => setRegisterForm({ ...registerForm, username: e.target.value })}
+                    placeholder="Nombre de usuario"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="reg-email">Email</Label>
+                  <Input
+                    id="reg-email"
+                    type="email"
+                    value={registerForm.email}
+                    onChange={(e) => setRegisterForm({ ...registerForm, email: e.target.value })}
+                    placeholder="correo@ejemplo.com"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="reg-password">Contraseña</Label>
+                  <Input
+                    id="reg-password"
+                    type="password"
+                    value={registerForm.password}
+                    onChange={(e) => setRegisterForm({ ...registerForm, password: e.target.value })}
+                    placeholder="Contraseña"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="reg-confirm">Confirmar Contraseña</Label>
+                  <Input
+                    id="reg-confirm"
+                    type="password"
+                    value={registerForm.confirmPassword}
+                    onChange={(e) => setRegisterForm({ ...registerForm, confirmPassword: e.target.value })}
+                    placeholder="Confirmar contraseña"
+                  />
+                </div>
+                <Button onClick={handleRegister} className="w-full">
+                  Crear Cuenta
+                </Button>
+                <Button variant="outline" onClick={() => setIsRegisterMode(false)} className="w-full">
+                  Volver al login
+                </Button>
+              </>
+            )}
           </CardContent>
         </Card>
       </div>
@@ -420,10 +617,19 @@ domain:s:`
               </div>
               <div>
                 <h1 className="text-2xl font-playfair font-bold">Gestor de Servidores GS1</h1>
-                <p className="text-sm text-muted-foreground">Sistema de administración profesional</p>
+                <p className="text-sm text-muted-foreground">
+                  Bienvenido {currentUser?.username} ({currentUser?.role})
+                </p>
               </div>
             </div>
-            <Button variant="outline" onClick={() => setIsAuthenticated(false)}>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setIsAuthenticated(false)
+                setCurrentUser(null)
+                setLoginForm({ username: "", password: "" })
+              }}
+            >
               Cerrar Sesión
             </Button>
           </div>
@@ -432,9 +638,10 @@ domain:s:`
 
       <div className="container mx-auto px-4 py-8">
         <Tabs defaultValue="dashboard" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className={`grid w-full ${currentUser?.role === "admin" ? "grid-cols-3" : "grid-cols-2"}`}>
             <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
             <TabsTrigger value="servers">Gestión de Servidores</TabsTrigger>
+            {currentUser?.role === "admin" && <TabsTrigger value="users">Gestión de Usuarios</TabsTrigger>}
           </TabsList>
 
           <TabsContent value="dashboard" className="space-y-6">
@@ -476,10 +683,10 @@ domain:s:`
               <Card>
                 <CardContent className="p-6">
                   <div className="flex items-center space-x-2">
-                    <Plus className="w-8 h-8 text-blue-600" />
+                    <Users className="w-8 h-8 text-blue-600" />
                     <div>
-                      <p className="text-2xl font-bold">1</p>
-                      <p className="text-sm text-muted-foreground">Usuarios Activos</p>
+                      <p className="text-2xl font-bold">{users.length}</p>
+                      <p className="text-sm text-muted-foreground">Usuarios Registrados</p>
                     </div>
                   </div>
                 </CardContent>
@@ -717,6 +924,127 @@ domain:s:`
               </CardContent>
             </Card>
           </TabsContent>
+
+          {currentUser?.role === "admin" && (
+            <TabsContent value="users" className="space-y-6">
+              <div className="flex justify-between items-center">
+                <div>
+                  <h2 className="text-3xl font-playfair font-bold">Gestión de Usuarios</h2>
+                  <p className="text-muted-foreground">Administre los usuarios del sistema</p>
+                </div>
+                <Dialog open={isAddUserDialogOpen} onOpenChange={setIsAddUserDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button>
+                      <Plus className="w-4 h-4 mr-2" />
+                      Agregar Usuario
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                      <DialogTitle className="font-playfair">Agregar Nuevo Usuario</DialogTitle>
+                      <DialogDescription>Complete la información del usuario</DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="new-username">Usuario</Label>
+                        <Input
+                          id="new-username"
+                          value={newUser.username || ""}
+                          onChange={(e) => setNewUser({ ...newUser, username: e.target.value })}
+                          placeholder="nombre_usuario"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="new-email">Email</Label>
+                        <Input
+                          id="new-email"
+                          type="email"
+                          value={newUser.email || ""}
+                          onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
+                          placeholder="usuario@ejemplo.com"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="new-password">Contraseña</Label>
+                        <Input
+                          id="new-password"
+                          type="password"
+                          value={newUser.password || ""}
+                          onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
+                          placeholder="••••••••"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="new-role">Rol</Label>
+                        <select
+                          id="new-role"
+                          className="w-full p-2 border rounded-md"
+                          value={newUser.role || "user"}
+                          onChange={(e) => setNewUser({ ...newUser, role: e.target.value as "admin" | "user" })}
+                        >
+                          <option value="user">Usuario</option>
+                          <option value="admin">Administrador</option>
+                        </select>
+                      </div>
+                      <div className="flex justify-end space-x-2">
+                        <Button variant="outline" onClick={() => setIsAddUserDialogOpen(false)}>
+                          Cancelar
+                        </Button>
+                        <Button onClick={handleAddUser}>
+                          <Save className="w-4 h-4 mr-2" />
+                          Guardar
+                        </Button>
+                      </div>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              </div>
+
+              <Card>
+                <CardContent className="p-0">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Usuario</TableHead>
+                        <TableHead>Email</TableHead>
+                        <TableHead>Rol</TableHead>
+                        <TableHead>Fecha de Creación</TableHead>
+                        <TableHead>Último Acceso</TableHead>
+                        <TableHead>Acciones</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {users.map((user) => (
+                        <TableRow key={user.id}>
+                          <TableCell className="font-medium">{user.username}</TableCell>
+                          <TableCell>{user.email}</TableCell>
+                          <TableCell>
+                            <Badge variant={user.role === "admin" ? "default" : "secondary"}>
+                              {user.role === "admin" ? "Administrador" : "Usuario"}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>{new Date(user.createdAt).toLocaleDateString()}</TableCell>
+                          <TableCell>
+                            {user.lastLogin ? new Date(user.lastLogin).toLocaleDateString() : "Nunca"}
+                          </TableCell>
+                          <TableCell>
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              onClick={() => handleDeleteUser(user.id)}
+                              disabled={user.id === 1} // Protect default admin
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          )}
         </Tabs>
       </div>
     </div>
