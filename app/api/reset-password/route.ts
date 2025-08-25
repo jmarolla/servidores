@@ -1,8 +1,12 @@
 import { type NextRequest, NextResponse } from "next/server"
 
+const resetTokensStore: Record<string, any> = {}
+
 export async function POST(request: NextRequest) {
   try {
     const { token, newPassword } = await request.json()
+
+    console.log("[v0] Reset password attempt with token:", token)
 
     if (!token || !newPassword) {
       return NextResponse.json(
@@ -13,11 +17,16 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Validate token (in production, check against database)
-    const resetTokens = JSON.parse(process.env.RESET_TOKENS || "{}")
-    const tokenData = resetTokens[token]
+    const envTokens = JSON.parse(process.env.RESET_TOKENS || "{}")
+    const allTokens = { ...envTokens, ...resetTokensStore }
+
+    console.log("[v0] Available tokens:", Object.keys(allTokens))
+
+    const tokenData = allTokens[token]
+    console.log("[v0] Token data found:", tokenData)
 
     if (!tokenData || Date.now() > tokenData.expiry) {
+      console.log("[v0] Token invalid or expired")
       return NextResponse.json(
         {
           error: "Token inválido o expirado",
@@ -26,20 +35,15 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // In a real application, you would update the password in your database
-    // For this demo, we'll return success
-    // The frontend will handle updating localStorage
-
-    // Clear the used token
-    delete resetTokens[token]
-    process.env.RESET_TOKENS = JSON.stringify(resetTokens)
+    delete resetTokensStore[token]
+    console.log("[v0] Token cleared, returning username:", tokenData.username)
 
     return NextResponse.json({
       message: "Contraseña actualizada exitosamente",
-      username: tokenData.username, // Return username for localStorage lookup
+      username: tokenData.username,
     })
   } catch (error) {
-    console.error("Error resetting password:", error)
+    console.error("[v0] Error resetting password:", error)
     return NextResponse.json(
       {
         error: "Error al restablecer la contraseña",
@@ -47,4 +51,9 @@ export async function POST(request: NextRequest) {
       { status: 500 },
     )
   }
+}
+
+export function setResetToken(token: string, data: any) {
+  resetTokensStore[token] = data
+  console.log("[v0] Token stored:", token, data)
 }

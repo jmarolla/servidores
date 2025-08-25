@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Server, Plus, Save, Monitor, Activity, Edit, Users, Trash2 } from "lucide-react"
+import { Server, Plus, Save, Monitor, Activity, Edit, Users, Trash2, Copy } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 
 interface ServerInterface {
@@ -526,6 +526,22 @@ domain:s:`
     }
   }
 
+  const copyToClipboard = async (password: string, serverName: string) => {
+    try {
+      await navigator.clipboard.writeText(password)
+      toast({
+        title: "Contraseña copiada",
+        description: `Contraseña de ${serverName} copiada al portapapeles`,
+      })
+    } catch (err) {
+      toast({
+        title: "Error",
+        description: "No se pudo copiar la contraseña",
+        variant: "destructive",
+      })
+    }
+  }
+
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "online":
@@ -917,6 +933,7 @@ domain:s:`
                       <TableHead>IP Externa</TableHead>
                       <TableHead>DNS / Hostname</TableHead>
                       <TableHead>Usuario</TableHead>
+                      <TableHead>Contraseña</TableHead>
                       <TableHead>Acciones</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -929,6 +946,17 @@ domain:s:`
                         <TableCell>{server.ip_externa || "-"}</TableCell>
                         <TableCell className="max-w-xs truncate">{server.dns || "-"}</TableCell>
                         <TableCell>{server.usuario}</TableCell>
+                        <TableCell>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => copyToClipboard(server.contrasena, server.nombre)}
+                            className="h-8 px-2 text-xs"
+                          >
+                            <Copy className="w-3 h-3 mr-1" />
+                            Copiar
+                          </Button>
+                        </TableCell>
                         <TableCell>
                           <div className="flex space-x-2">
                             <Button
