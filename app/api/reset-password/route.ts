@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       message: "Contraseña actualizada exitosamente",
-      email: tokenData.email,
+      username: tokenData.username, // Return username for localStorage lookup
     })
   } catch (error) {
     console.error("Error resetting password:", error)

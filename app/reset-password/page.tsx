@@ -77,10 +77,10 @@ export default function ResetPassword() {
       const data = await response.json()
 
       if (response.ok) {
-        const userEmail = data.email
+        const username = data.username
         const users = JSON.parse(localStorage.getItem("gs1-users") || "[]")
         const updatedUsers = users.map((user: any) =>
-          user.email === userEmail ? { ...user, password: newPassword } : user,
+          user.username === username ? { ...user, password: newPassword } : user,
         )
         localStorage.setItem("gs1-users", JSON.stringify(updatedUsers))
 
@@ -89,7 +89,9 @@ export default function ResetPassword() {
           description: "Tu contraseña ha sido actualizada exitosamente",
         })
 
-        router.push("/")
+        setTimeout(() => {
+          router.push("/")
+        }, 2000)
       } else {
         toast({
           title: "Error",
