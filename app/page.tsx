@@ -269,26 +269,8 @@ export default function ServerManager() {
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault()
 
-    const cleanUsername = username.trim()
-    const cleanPassword = password.trim()
-
-    console.log("[v0] Login attempt:", {
-      originalUsername: `"${username}"`,
-      cleanUsername: `"${cleanUsername}"`,
-      originalPassword: `"${password}"`,
-      cleanPassword: `"${cleanPassword}"`,
-      usernameLength: username.length,
-      passwordLength: password.length,
-    })
-
     const users = JSON.parse(localStorage.getItem("gs1-users") || "[]")
-    console.log(
-      "[v0] Available users:",
-      users.map((u) => ({ username: u.username, passwordLength: u.password?.length })),
-    )
-
-    const user = users.find((u: any) => u.username === cleanUsername && u.password === cleanPassword)
-    console.log("[v0] User found:", !!user)
+    const user = users.find((u: any) => u.username === username && u.password === password)
 
     if (user) {
       setCurrentUser(user)
