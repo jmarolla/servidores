@@ -99,7 +99,7 @@ export default function ServerManager() {
           ip_externa: "54.157.136.249",
           dns: "ec2-18-204-145-139.compute-1.amazonaws.com",
           usuario: "administrator",
-          contrasena: "p0$rfdsg926vd*9xlk539h35jyiwo3%#t",
+          contrasena: "p0$rfdsg926vd^9xik539h35jyiwo%#t",
           status: "online",
         },
         {
@@ -109,7 +109,7 @@ export default function ServerManager() {
           ip_externa: "54.157.96.99",
           dns: "ec2-54-157-96-99.compute-1.amazonaws.com",
           usuario: "administrator",
-          contrasena: "EMXO@uV$F7EuL5jK3Z3nz8?U5GHbz0l-",
+          contrasena: "EMXO@uV$F7EuL5)k$Z3nz8?U5GHbz0l-",
           status: "online",
         },
         {
@@ -119,7 +119,7 @@ export default function ServerManager() {
           ip_externa: "3.83.120.9",
           dns: "ec2-3-81-155-40.compute-1.amazonaws.com",
           usuario: "administrator",
-          contrasena: "%Y3$8?g&jGdux8299aph0R4clhHRmC",
+          contrasena: "%Y3$;8?g&j6dux82$93aph0R4c!hHRmC",
           status: "online",
         },
         {
@@ -129,7 +129,7 @@ export default function ServerManager() {
           ip_externa: "54.166.163.151",
           dns: "ec2-54-166-163-151.compute-1.amazonaws.com",
           usuario: "administrator",
-          contrasena: "8edRiwp&Cy*w7yU@l5ya58Em@nJf&aL",
+          contrasena: "8edRiwp&Cy*w?y!J@I5ya58Em@nJf&aL",
           status: "online",
         },
         {
@@ -139,7 +139,7 @@ export default function ServerManager() {
           ip_externa: "",
           dns: "ec2-34-193-208-63.compute-1.amazonaws.com",
           usuario: "administrator",
-          contrasena: "t$C?dBVlX3epybGpTF)rGlH?gThTa",
+          contrasena: "t$C;1dBVIX3epybGpTF;)rGlH.tg?hTa",
           status: "offline",
         },
         {
@@ -149,7 +149,7 @@ export default function ServerManager() {
           ip_externa: "54.197.43.187",
           dns: "ec2-54-197-43-187.compute-1.amazonaws.com",
           usuario: "gs1admin",
-          contrasena: "3b8!dqw@m1*ih%aam2f628$@l8%lb$&w",
+          contrasena: "3b81dqw@m1*ih%aamzl628$@l8%!b5&w",
           status: "online",
         },
         {
@@ -159,7 +159,7 @@ export default function ServerManager() {
           ip_externa: "18.232.181.203",
           dns: "ec2-54-197-43-187.compute-1.amazonaws.com",
           usuario: "administrator",
-          contrasena: "$95GoYv@Vnas.%Sv6jFXfz53OPUNHol",
+          contrasena: "S95GoYv@Wnas.%Sv6jFXfzS3OPUN;Hol",
           status: "online",
         },
         {
@@ -179,7 +179,7 @@ export default function ServerManager() {
           ip_externa: "",
           dns: "ec2-34-193-208-63.compute-1.amazonaws.com",
           usuario: "administrator...",
-          contrasena: "fC=ZM%ujrOEjZNMRhF5XPq359l$7d*=M",
+          contrasena: "gz^5tX&mxihQ@*Kalm78ip*Ed9z!4KzJ",
           status: "online",
         },
         {
@@ -189,7 +189,7 @@ export default function ServerManager() {
           ip_externa: "",
           dns: "ec2-44-223-11-252.compute-1.amazonaws.com",
           usuario: "administrator",
-          contrasena: "g2*St&amxihQ@*Kalm78ip*Ed9zl4KzJ",
+          contrasena: "gz^5tX&mxihQ@*Kalm78ip*Ed9z!4KzJ",
           status: "online",
         },
         {
@@ -199,7 +199,7 @@ export default function ServerManager() {
           ip_externa: "",
           dns: "ec2-54-90-50-97.compute-1.amazonaws.com",
           usuario: "administrator",
-          contrasena: "123r#zq%$!@$o&4p&7n&72&4hn19*pq",
+          contrasena: "!23r#zq%$!@$o&q4p&7n&72&4hn19*pq",
           status: "online",
         },
         {
@@ -209,7 +209,7 @@ export default function ServerManager() {
           ip_externa: "",
           dns: "ec2-3-95-226-157.compute-1.amazonaws.com",
           usuario: "administrator",
-          contrasena: "(uMhAeUZ3.O(mmW81MIPZ@aUvn?WRW.P",
+          contrasena: "(uMhAeUZ3.O(nmW81MiPZ@aUvn?WRW.P",
           status: "online",
         },
         {
@@ -219,17 +219,7 @@ export default function ServerManager() {
           ip_externa: "",
           dns: "ec2-52-54-155-1.compute-1.amazonaws.com",
           usuario: "administrator...",
-          contrasena: "fC=ZM%ujrOEjZNMRhF5XPq359l$7d*=M",
-          status: "online",
-        },
-        {
-          id: 14,
-          nombre: "AD-DC-GS1",
-          ip_interna: "",
-          ip_externa: "",
-          dns: "ec2-3-90-207-144.compute-1.amazonaws.com",
-          usuario: "administrator",
-          contrasena: "gvLuGZ5ZauxlSx7%.1Nt.nKTdPQsvP",
+          contrasena: "fC=ZM%ujroEjZNMRhF5XPq359l$7d*=M",
           status: "online",
         },
         {
@@ -259,7 +249,7 @@ export default function ServerManager() {
           ip_externa: "172.31.3.206",
           dns: "",
           usuario: "administrador",
-          contrasena: "",
+          contrasena: "zUc0$2P5ag.tzsjOdCfX=?eV09&fG((S",
           status: "online",
         },
       ])
