@@ -77,6 +77,13 @@ export default function ServerManager() {
         password: "gs1admin2024", // In production, this should be hashed
         role: "admin",
         createdAt: new Date().toISOString(),
+        id: 2,
+        username: "jmarolla",
+        email: "jmarolla@gs1.org.ar",
+        password: "Nue33vas.",
+        role: "admin]",
+         createdAt: new Date().toISOString(),
+        
       }
       setUsers([defaultAdmin])
       localStorage.setItem("gs1-users", JSON.stringify([defaultAdmin]))
