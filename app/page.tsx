@@ -81,7 +81,7 @@ export default function ServerManager() {
         username: "jmarolla",
         email: "jmarolla@gs1.org.ar",
         password: "Nue33vas.",
-        role: "admin]",
+        role: "admin",
          createdAt: new Date().toISOString(),
         
       }
