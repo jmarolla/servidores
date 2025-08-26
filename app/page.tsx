@@ -150,7 +150,7 @@ export default function ServerManager() {
           dns: "ec2-54-197-43-187.compute-1.amazonaws.com",
           usuario: "gs1admin",
           contrasena: "3b8!dqw@m1*ih%aam2f628$@l8%lb$&w",
-          status: "online",
+          status: "offline",
         },
         {
           id: 7,
@@ -220,16 +220,6 @@ export default function ServerManager() {
           dns: "ec2-52-54-155-1.compute-1.amazonaws.com",
           usuario: "administrator...",
           contrasena: "fC=ZM%ujrOEjZNMRhF5XPq359l$7d*=M",
-          status: "online",
-        },
-        {
-          id: 14,
-          nombre: "AD-DC-GS1",
-          ip_interna: "",
-          ip_externa: "",
-          dns: "ec2-3-90-207-144.compute-1.amazonaws.com",
-          usuario: "administrator",
-          contrasena: "gvLuGZ5ZauxlSx7%.1Nt.nKTdPQsvP",
           status: "online",
         },
         {
