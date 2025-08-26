@@ -178,8 +178,8 @@ export default function ServerManager() {
           ip_interna: "",
           ip_externa: "",
           dns: "ec2-34-193-208-63.compute-1.amazonaws.com",
-          usuario: "administrator",
-          contrasena: "g2*St&amxihQ@*Kalm78ip*Ed9zl4KzJ",
+          usuario: "administrator...",
+          contrasena: "fC=ZM%ujrOEjZNMRhF5XPq359l$7d*=M",
           status: "online",
         },
         {
@@ -557,37 +557,37 @@ domain:s:`
 
   if (!isLoggedIn) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-teal-50 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center p-4">
         <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md">
           <div className="text-center mb-8">
-            <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-emerald-200">
+            <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-slate-300">
               <img src="/gs1_icon.ico" alt="GS1 Logo" className="w-10 h-10" />
             </div>
             <div className="mb-2">
-              <h1 className="text-2xl font-bold text-gray-900">Gestor de Servidores GS1</h1>
+              <h1 className="text-2xl font-bold text-slate-800">Gestor de Servidores GS1</h1>
             </div>
-            <p className="text-gray-600">Accede a tu panel de control</p>
+            <p className="text-slate-600">Accede a tu panel de control</p>
           </div>
 
           <form onSubmit={handleLogin} className="space-y-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Usuario</label>
+              <label className="block text-sm font-medium text-slate-700 mb-2">Usuario</label>
               <input
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-slate-500"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Contraseña</label>
+              <label className="block text-sm font-medium text-slate-700 mb-2">Contraseña</label>
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-slate-500"
                 required
               />
             </div>
@@ -596,7 +596,7 @@ domain:s:`
 
             <button
               type="submit"
-              className="w-full bg-emerald-600 text-white py-3 px-4 rounded-lg hover:bg-emerald-700 transition-colors font-medium"
+              className="w-full bg-slate-700 text-white py-3 px-4 rounded-lg hover:bg-slate-800 transition-colors font-medium"
             >
               Iniciar Sesión
             </button>
@@ -605,7 +605,7 @@ domain:s:`
               <button
                 type="button"
                 onClick={() => setIsForgotPasswordOpen(true)}
-                className="text-emerald-600 hover:text-emerald-700 text-sm font-medium"
+                className="text-slate-600 hover:text-slate-800 text-sm font-medium"
               >
                 ¿Olvidaste tu contraseña?
               </button>
@@ -647,29 +647,28 @@ domain:s:`
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="border-b bg-card">
+      <header className="border-b bg-slate-800 text-white">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center border">
+              <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
                 <img src="/gs1_icon.ico" alt="GS1 Logo" className="w-6 h-6" />
               </div>
               <div>
-                <h1 className="text-2xl font-playfair font-bold">Gestor de Servidores GS1</h1>
-                <p className="text-sm text-muted-foreground">
+                <h1 className="text-2xl font-playfair font-bold text-white">Gestor de Servidores GS1</h1>
+                <p className="text-sm text-slate-300">
                   Bienvenido {currentUser?.username} ({currentUser?.role})
                 </p>
               </div>
             </div>
             <Button
               variant="outline"
+              className="border-slate-600 text-slate-300 hover:bg-slate-700 hover:text-white bg-transparent"
               onClick={() => {
                 setIsLoggedIn(false)
                 setCurrentUser(null)
-                setUsername("")
-                setPassword("")
               }}
             >
               Cerrar Sesión
@@ -743,15 +742,15 @@ domain:s:`
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  <div className="flex items-center space-x-4 p-3 bg-green-50 rounded-lg">
-                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                  <div className="flex items-center space-x-4 p-3 bg-slate-50 rounded-lg">
+                    <div className="w-2 h-2 bg-slate-600 rounded-full"></div>
                     <div className="flex-1">
                       <p className="text-sm font-medium">Conexión exitosa a IIS01</p>
                       <p className="text-xs text-muted-foreground">Hace 5 minutos</p>
                     </div>
                   </div>
-                  <div className="flex items-center space-x-4 p-3 bg-blue-50 rounded-lg">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                  <div className="flex items-center space-x-4 p-3 bg-orange-50 rounded-lg">
+                    <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
                     <div className="flex-1">
                       <p className="text-sm font-medium">SQL-PORTAL BackEnd actualizado</p>
                       <p className="text-xs text-muted-foreground">Hace 1 hora</p>
